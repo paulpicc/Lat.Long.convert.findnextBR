@@ -47,18 +47,16 @@ def main():
         longitude_decimal = parse_coordinates(longitude_decimal)
 
         if latitude_decimal is not None and longitude_decimal is not None:
-            # Display in other formats
+            st.write("## Decimal Degrees:")
+            st.write("  Latitude: {:.6f}".format(latitude_decimal))
+            st.write("  Longitude: {:.6f}".format(longitude_decimal))
+            st.write("  Lat, Long: {:.6f}, {:.6f}".format(latitude_decimal, longitude_decimal))
+
+            st.write("## Degrees, Minutes, Seconds (DMS):")
             lat_degrees, lat_minutes, lat_seconds = decimal_to_dms(latitude_decimal)
             long_degrees, long_minutes, long_seconds = decimal_to_dms(longitude_decimal)
-
-            st.write("Decimal Degrees:")
-            st.write(f"Latitude: {latitude_decimal:.6f}")
-            st.write(f"Longitude: {longitude_decimal:.6f}")
-            st.write(f"Lat, Long: {latitude_decimal:.6f}, {longitude_decimal:.6f}")
-
-            st.write("Degrees, Minutes, Seconds (DMS):")
-            st.write(f"Latitude: {format_dms(lat_degrees, lat_minutes, lat_seconds, 'N' if latitude_decimal >=0 else 'S')}")
-            st.write(f"Longitude: {format_dms(long_degrees, long_minutes, long_seconds, 'E' if longitude_decimal >=0 else 'W')}")
+            st.write("  Latitude: {}".format(format_dms(lat_degrees, lat_minutes, lat_seconds, 'N' if latitude_decimal >=0 else 'S')))
+            st.write("  Longitude: {}".format(format_dms(long_degrees, long_minutes, long_seconds, 'E' if longitude_decimal >=0 else 'W')))
 
 if __name__ == "__main__":
     main()
