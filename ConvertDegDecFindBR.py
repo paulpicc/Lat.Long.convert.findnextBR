@@ -76,8 +76,7 @@ elif tab == "Find Next with Bearing Range":
     lat_deg = st.text_input("Enter Starting Latitude (e.g., 40 26 46 N, 40.4462, 40 degrees 26 minutes 46 seconds N):")
     lon_deg = st.text_input("Enter Starting Longitude (e.g., 79 56 55 W, -79.9486, 79 degrees 56 minutes 55 seconds W):")
     bearing = st.text_input("Enter Bearing (in degrees):")
-    distance_unit = st.selectbox("Distance Unit", ["nmi", "km", "mi"])
-    distance = st.text_input("Enter Distance:")
+    distance = st.text_input("Enter Distance (in nautical miles):")
 
     if st.button("Find Next"):
         try:
@@ -102,14 +101,7 @@ elif tab == "Find Next with Bearing Range":
                 raise ValueError("Invalid longitude format")
 
             bearing = float(bearing)
-            distance = float(distance)
-
-            if distance_unit == "nmi":
-                distance_km = distance * 1.852
-            elif distance_unit == "km":
-                distance_km = distance
-            elif distance_unit == "mi":
-                distance_km = distance * 1.60934
+            distance_km = float(distance) * 1.852
 
             lat1, lon1 = math.radians(lat_dec), math.radians(lon_dec)
             bearing = math.radians(bearing)
