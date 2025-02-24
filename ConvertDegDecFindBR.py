@@ -1,44 +1,24 @@
 import streamlit as st
-import math
 import re
+import math
 
-def deg_min_sec_to_dec(deg, min=None, sec=None, direction=None):
-    if min is None and sec is None:
-        return deg
-    else:
-        if direction == "S" or direction == "W":
-            return -((deg + min / 60 + sec / 3600))
-        else:
-            return (deg + min / 60 + sec / 3600)
+def deg_min_sec_to_dec(deg, min, sec):
+    return deg + min / 60 + sec / 3600
 
-def dec_to_deg_min_sec(dec, direction=None):
-    if dec < 0:
-        direction = "S" if dec < 0 else "N"
-    else:
-        direction = "N" if dec > 0 else "S"
-    dec = abs(dec)
-    deg = math.floor(dec)
-    min = math.floor((dec - deg) * 60)
-    sec = round(((dec - deg) * 3600) % 60, 2)
-    return f"{deg} {min} {sec} {direction}"
-
-def calculate_bearing(lat1, lon1, lat2, lon2):
-    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    y = math.sin(dlon) * math.cos(lat2)
-    x = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(dlon)
-    bearing = math.degrees(math.atan2(y, x))
-    return bearing
+def dec_to_deg_min_sec(dec, direction):
+    deg = int(dec)
+    min = int((dec - deg) * 60)
+    sec = round(((dec - deg) * 60 - min) * 60)
+    return f"{abs(deg)} degrees {min} minutes {sec} seconds {direction}"
 
 def main():
-    st.title("Coordinate Converter and Navigator")
+    st.title("Convert Deg Dec Find BR")
 
-    tabs = ["Convert Lat/Long", "Find Next with Bearing Range"]
-    tab = st.sidebar.selectbox("Select a tab", tabs)
+    options = ["Convert Coordinates", "Find Next with Bearing Range"]
+    tab = st.selectbox("Select an option", options)
 
-    if tab == "Convert Lat/Long":
-        st.title("Convert Lat/Long")
+    if tab == "Convert Coordinates":
+        st.title("Convert Coordinates")
 
         lat_deg = st.text_input("Enter Latitude (e.g., 40 26 46 N, 40.4462, 40 degrees 26 minutes 46 seconds N):")
         lon_deg = st.text_input("Enter Longitude (e.g., 79 56 55 W, -79.9486, 79 degrees 56 minutes 55 seconds W):")
@@ -68,7 +48,7 @@ def main():
                 lat_dms = dec_to_deg_min_sec(lat_dec, "N" if lat_dec > 0 else "S")
                 lon_dms = dec_to_deg_min_sec(lon_dec, "E" if lon_dec > 0 else "W")
 
-                st.write("### Conversion Results:")
+                st.write("### Converted Coordinates:")
                 st.write("#### Decimal Degrees:")
                 st.write(f"Latitude: {lat_dec:.6f}")
                 st.write(f"Longitude: {lon_dec:.6f}")
@@ -79,7 +59,7 @@ def main():
             except Exception as e:
                 st.write("An error occurred: ", e)
 
-    if tab == "Find Next with Bearing Range":
+    elif tab == "Find Next with Bearing Range":
         st.title("Find Next with Bearing Range")
 
         lat_deg = st.text_input("Enter Starting Latitude (e.g., 40 26 46 N, 40.4462, 40 degrees 26 minutes 46 seconds N):")
@@ -99,6 +79,8 @@ def main():
             try:
                 lat_deg = re.sub(r'[^\d\.\s-]', '', lat_deg)
                 lon_deg = re.sub(r'[^\d\.\s-]', '', lon_deg)
+
+                lon_deg = lon_deg.replace(" ", "").replace("N", "").replace("S", "").replace("E", "").replace("W", "")
 
                 lat_deg_parts = lat_deg.split()
                 lon_deg_parts = lon_deg.split()
