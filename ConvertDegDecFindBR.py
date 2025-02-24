@@ -39,7 +39,7 @@ def format_dms(degrees, minutes, seconds, direction=""):
 
 def main():
     """Main function to handle coordinate conversion."""
-    st.title("Latitude and Longitude Converter")
+    st.title("Convert Lat/Long between Degreee-Decimal")
 
     latitude_decimal = st.text_input("Enter latitude (e.g., 37.7749 or 37°47'29.6\"N): ")
     longitude_decimal = st.text_input("Enter longitude (e.g., -122.4194 or 122°25'10.1\"W): ")
