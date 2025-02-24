@@ -9,7 +9,7 @@ def dec_to_deg_min_sec(dec, direction):
     deg = int(dec)
     min = int((dec - deg) * 60)
     sec = round(((dec - deg) * 60 - min) * 60)
-    return f"{abs(deg)} degrees {min} minutes {sec} seconds {direction}"
+    return f"{abs(deg)}\u00B0 {min}' {sec}\" {direction}"
 
 def main():
     st.title("Convert Deg Dec Find BR")
