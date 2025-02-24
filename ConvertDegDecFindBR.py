@@ -13,14 +13,14 @@ def deg_min_sec_to_dec(deg, min=None, sec=None, direction=None):
 
 def dec_to_deg_min_sec(dec, direction=None):
     if dec < 0:
-        direction = "S" if dec < 0 else "N"
+        direction = "S" if direction in ["S", "N"] else "W"
     else:
-        direction = "N" if dec > 0 else "S"
+        direction = "N" if direction in ["S", "N"] else "E"
     dec = abs(dec)
     deg = math.floor(dec)
     min = math.floor((dec - deg) * 60)
     sec = round(((dec - deg) * 3600) % 60, 2)
-    return f"{deg} {min} {sec} {direction}"
+    return f"{deg}° {min}' {sec}" {direction}"
 
 def calculate_bearing(lat1, lon1, lat2, lon2):
     lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
