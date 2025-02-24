@@ -133,7 +133,4 @@ def main():
                 st.write("### Next Coordinates:")
                 st.write("#### Decimal Degrees:")
                 st.write(f"Latitude: {lat2:.6f}")
-                st.write(f"Longitude: {lon2:.6f}")
-                st.write(f"Coordinates: {lat2:.6f}, {lon2:.6f}")
-                st.write("#### Degrees, Minutes, Seconds:")
-                st.write(f"Latitude: {lat_dms}")
+                st.write(f"Longitude: {lon
