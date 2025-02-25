@@ -1,7 +1,6 @@
 import streamlit as st
-import math
 
-# Function to convert decimal degrees to DMS
+# Your original code
 def decimal_degrees_to_dms(decimal_degrees):
     is_negative = decimal_degrees < 0
     decimal_degrees = abs(decimal_degrees)
@@ -13,13 +12,11 @@ def decimal_degrees_to_dms(decimal_degrees):
         degrees = -degrees
     return (degrees, minutes, seconds)
 
-# Function to convert DMS to decimal degrees
 def dms_to_decimal_degrees(degrees, minutes, seconds):
     sign = -1 if degrees < 0 else 1
     degrees = abs(degrees)
     return sign * (degrees + (minutes / 60) + (seconds / 3600))
 
-# Function to parse coordinates in either decimal degrees or DMS format
 def parse_coordinates(input_str, is_latitude=True):
     if "°" in input_str:
         parts = input_str.strip().replace('"', '').replace("'", ' ').replace('°', ' ').split()
@@ -47,7 +44,6 @@ def parse_coordinates(input_str, is_latitude=True):
             else:
                 raise ValueError("Invalid coordinate format")
 
-# Function to calculate destination point given starting coordinates, bearing, and distance
 def calculate_destination(lat1, lon1, bearing_deg, distance_nm, unit="nmi"):
     if unit == "nmi":
         R = 3440.07  # Approximately 3440.07 nautical miles
@@ -84,20 +80,25 @@ tab1, tab2 = st.tabs(["Convert between DMS and Decimal Degrees", "Calculate Next
 
 with tab1:
     st.header("Convert between DMS and Decimal Degrees")
-    input_str = st.text_input("Enter coordinates in either decimal degrees (e.g., 40.7128 or 40.7128N) or DMS format (e.g., 40° 42' 46.08\" N)")
+    lat_input = st.text_input("Enter latitude in either decimal degrees or DMS format")
+    lon_input = st.text_input("Enter longitude in either decimal degrees or DMS format")
     if st.button("Convert"):
         try:
-            decimal_degrees = parse_coordinates(input_str)
-            dms = decimal_degrees_to_dms(decimal_degrees)
-            st.write(f"Decimal Degrees: {decimal_degrees:.6f}")
-            st.write(f"DMS: {dms[0]}° {dms[1]}' {dms[2]:.2f}\"")
+            lat_dd = parse_coordinates(lat_input, is_latitude=True)
+            lon_dd = parse_coordinates(lon_input, is_latitude=False)
+            lat_dms = decimal_degrees_to_dms(lat_dd)
+            lon_dms = decimal_degrees_to_dms(lon_dd)
+            st.write(f"Latitude (Decimal Degrees): {lat_dd:.6f}")
+            st.write(f"Latitude (DMS): {lat_dms[0]}° {lat_dms[1]}' {lat_dms[2]:.2f}\"")
+            st.write(f"Longitude (Decimal Degrees): {lon_dd:.6f}")
+            st.write(f"Longitude (DMS): {lon_dms[0]}° {lon_dms[1]}' {lon_dms[2]:.2f}\"")
         except ValueError as e:
             st.error(f"Error: {e}")
 
 with tab2:
     st.header("Calculate Next Point")
-    lat_input = st.text_input("Enter starting latitude (e.g., 40.7128 or 40.7128N)")
-    lon_input = st.text_input("Enter starting longitude (e.g., -74.0060 or 74.0060W)")
+    lat_input = st.text_input("Enter starting latitude in either decimal degrees or DMS format")
+    lon_input = st.text_input("Enter starting longitude in either decimal degrees or DMS format")
     bearing_input = st.number_input("Enter bearing in degrees (0-360)", value=90)
     distance_input = st.number_input("Enter distance", value=50)
     unit_input = st.selectbox("Select unit", ["nmi", "km", "mi"])
@@ -110,7 +111,7 @@ with tab2:
             distance = distance_input
             unit = unit_input
             dest_lat, dest_lon = calculate_destination(lat, lon, bearing, distance, unit)
-            st.write(f"Starting Point: {format_dd_output(lat, True)}, {format_dd_output(lon, False)}")
+            st.write(f"Starting Point: {lat_input}, {lon_input}")
             st.write(f"Bearing: {bearing}°")
             st.write(f"Distance: {distance} {unit}")
             st.write(f"Destination Point: {format_dd_output(dest_lat, True)}, {format_dd_output(dest_lon, False)}")
