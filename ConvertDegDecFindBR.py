@@ -91,9 +91,9 @@ with tab1:
             lon_dd = parse_coordinates(lon_input.strip(), False)
             lat_dms = decimal_degrees_to_dms(lat_dd)
             lon_dms = decimal_degrees_to_dms(lon_dd)
-            st.write(f"Latitude (Decimal Degrees): {lat_dd:.6f}")
+            st.write(f"Latitude (Deg): {lat_dd:.6f}")
             st.write(f"Latitude (DMS): {lat_dms[0]}° {lat_dms[1]}' {lat_dms[2]:.2f}\"")
-            st.write(f"Longitude (Decimal Degrees): {lon_dd:.6f}")
+            st.write(f"Longitude (Deg): {lon_dd:.6f}")
             st.write(f"Longitude (DMS): {lon_dms[0]}° {lon_dms[1]}' {lon_dms[2]:.2f}\"")
             st.write(f"Decimal coordinates: {lat_dd:.6f}, {lon_dd:.6f}")
         except ValueError as e:
