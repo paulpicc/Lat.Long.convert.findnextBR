@@ -126,10 +126,12 @@ with tab2:
             distance = distance_input
             unit = unit_input
             dest_lat, dest_lon = calculate_destination(lat, lon, bearing, distance, unit)
+            dest_lat_dms = decimal_degrees_to_dms(dest_lat)
+            dest_lon_dms = decimal_degrees_to_dms(dest_lon)
             st.write(f"Starting Point: {lat_lon_input}")
             st.write(f"Bearing: {bearing}°")
             st.write(f"Distance: {distance} {unit}")
-            st.write(f"Destination Point: {dest_lat:.6f}, {dest_lon:.6f}")
-            st.write(f"Decimal coordinates: {dest_lat:.6f}, {dest_lon:.6f}")
+            st.write(f"Destination Point (DMS): {dest_lat_dms[0]}° {dest_lat_dms[1]}' {dest_lat_dms[2]:.2f}\", {dest_lon_dms[0]}° {dest_lon_dms[1]}' {dest_lon_dms[2]:.2f}\"")
+            st.write(f"Destination Point (Decimal Degrees): {dest_lat:.6f}, {dest_lon:.6f}")
         except ValueError as e:
             st.error(f"Error: {e}")
