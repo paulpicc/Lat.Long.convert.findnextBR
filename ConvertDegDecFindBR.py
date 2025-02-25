@@ -1,126 +1,126 @@
 import streamlit as st
-import re
 import math
 
-def deg_min_sec_to_dec(deg, min, sec):
-    return deg + min / 60 + sec / 3600
+# Function to convert decimal degrees to DMS
+def decimal_degrees_to_dms(decimal_degrees):
+    is_negative = decimal_degrees < 0
+    decimal_degrees = abs(decimal_degrees)
+    degrees = int(decimal_degrees)
+    decimal_minutes = (decimal_degrees - degrees) * 60
+    minutes = int(decimal_minutes)
+    seconds = (decimal_minutes - minutes) * 60
+    if is_negative:
+        degrees = -degrees
+    return (degrees, minutes, seconds)
 
-def dec_to_deg_min_sec(dec, direction):
-    deg = int(dec)
-    min = int((dec - deg) * 60)
-    sec = round(((dec - deg) * 60 - min) * 60)
-    return f"{abs(deg)}° {min}' {sec}\" {direction}"
+# Function to convert DMS to decimal degrees
+def dms_to_decimal_degrees(degrees, minutes, seconds):
+    sign = -1 if degrees < 0 else 1
+    degrees = abs(degrees)
+    return sign * (degrees + (minutes / 60) + (seconds / 3600))
 
-def main():
-    st.title("Convert Deg Dec Find BR")
+# Function to parse coordinates in either decimal degrees or DMS format
+def parse_coordinates(input_str, is_latitude=True):
+    if "°" in input_str:
+        parts = input_str.strip().replace('"', '').replace("'", ' ').replace('°', ' ').split()
+        degrees = float(parts[0])
+        minutes = float(parts[1]) if len(parts) > 1 else 0
+        seconds = float(parts[2]) if len(parts) > 2 else 0
+        if len(parts) > 3:
+            direction = parts[3].upper()
+            if (is_latitude and direction == 'S') or (not is_latitude and direction == 'W'):
+                degrees = -abs(degrees)
+        return dms_to_decimal_degrees(degrees, minutes, seconds)
+    else:
+        try:
+            value = float(input_str.strip())
+            return value
+        except ValueError:
+            if input_str[-1].upper() in ['N', 'S', 'E', 'W']:
+                try:
+                    value = float(input_str[:-1].strip())
+                    if input_str[-1].upper() in ['S', 'W']:
+                        value = -abs(value)
+                    return value
+                except ValueError:
+                    raise ValueError("Invalid coordinate format")
+            else:
+                raise ValueError("Invalid coordinate format")
 
-    options = ["Convert Coordinates", "Find Next with Bearing Range"]
-    tab = st.selectbox("Select an option", options)
+# Function to calculate destination point given starting coordinates, bearing, and distance
+def calculate_destination(lat1, lon1, bearing_deg, distance_nm, unit="nmi"):
+    if unit == "nmi":
+        R = 3440.07  # Approximately 3440.07 nautical miles
+    elif unit == "km":
+        R = 6371.0  # Earth's radius in km
+    elif unit == "mi":
+        R = 3959.0  # Earth's radius in miles
+    else:
+        raise ValueError("Invalid unit")
 
-    if tab == "Convert Coordinates":
-        st.title("Convert Coordinates")
+    lat1 = math.radians(lat1)
+    lon1 = math.radians(lon1)
+    bearing_rad = math.radians(bearing_deg)
 
-        lat_deg = st.text_input("Enter Latitude (e.g., 40 26 46 N, 40.4462, 40 degrees 26 minutes 46 seconds N):")
-        lon_deg = st.text_input("Enter Longitude (e.g., 79 56 55 W, -79.9486, 79 degrees 56 minutes 55 seconds W):")
+    d = distance_nm / R
 
-        if st.button("Convert"):
-            try:
-                lat_deg = re.sub(r'[^\d\.\s-]', '', lat_deg)
-                lon_deg = re.sub(r'[^\d\.\s-]', '', lon_deg)
+    lat2 = math.asin(math.sin(lat1) * math.cos(d) +
+                     math.cos(lat1) * math.sin(d) * math.cos(bearing_rad))
 
-                lat_deg_parts = lat_deg.split()
-                lon_deg_parts = lon_deg.split()
+    lon2 = lon1 + math.atan2(math.sin(bearing_rad) * math.sin(d) * math.cos(lat1),
+                             math.cos(d) - math.sin(lat1) * math.sin(lat2))
 
-                if len(lat_deg_parts) == 1:
-                    lat_dec = float(lat_deg_parts[0])
-                elif len(lat_deg_parts) == 3:
-                    lat_dec = deg_min_sec_to_dec(float(lat_deg_parts[0]), float(lat_deg_parts[1]), float(lat_deg_parts[2]))
-                else:
-                    raise ValueError("Invalid latitude format")
+    lat2 = math.degrees(lat2)
+    lon2 = math.degrees(lon2)
 
-                if len(lon_deg_parts) == 1:
-                    lon_dec = float(lon_deg_parts[0])
-                elif len(lon_deg_parts) == 3:
-                    lon_dec = deg_min_sec_to_dec(float(lon_deg_parts[0]), float(lon_deg_parts[1]), float(lon_deg_parts[2]))
-                else:
-                    raise ValueError("Invalid longitude format")
+    lon2 = (lon2 + 540) % 360 - 180
 
-                lat_dms = dec_to_deg_min_sec(lat_dec, "N" if lat_dec > 0 else "S")
-                lon_dms = dec_to_deg_min_sec(lon_dec, "E" if lon_dec > 0 else "W")
+    return (lat2, lon2)
 
-                st.write("### Converted Coordinates:")
-                st.write("#### Decimal Degrees:")
-                st.write(f"Latitude: {lat_dec:.6f}")
-                st.write(f"Longitude: {lon_dec:.6f}")
-                st.write(f"Coordinates: {lat_dec:.6f}, {lon_dec:.6f}")
-                st.write("#### Degrees, Minutes, Seconds:")
-                st.write(f"Latitude: {lat_dms}")
-                st.write(f"Longitude: {lon_dms}")
-            except Exception as e:
-                st.write("An error occurred: ", e)
+# Function to format decimal degrees as a human-readable string
+def format_dd_output(decimal_degrees, is_latitude=True):
+    if is_latitude:
+        return f"{abs(decimal_degrees):.6f}° {'N' if decimal_degrees >= 0 else 'S'}"
+    else:
+        return f"{abs(decimal_degrees):.6f}° {'E' if decimal_degrees >= 0 else 'W'}"
 
-    elif tab == "Find Next with Bearing Range":
-        st.title("Find Next with Bearing Range")
+# Streamlit app
+st.title("Latitude and Longitude Converter")
 
-        lat_deg = st.text_input("Enter Starting Latitude (e.g., 40 26 46 N, 40.4462, 40 degrees 26 minutes 46 seconds N):")
-        lon_deg = st.text_input("Enter Starting Longitude (e.g., 79 56 55 W, -79.9486, 79 degrees 56 minutes 55 seconds W):")
-        bearing = st.text_input("Enter Bearing (in degrees):")
-        distance_unit = st.selectbox("Distance Unit", ["Nautical Miles (NM)", "Kilometers (KM)", "Miles (MI)"])
-        distance = st.text_input("Enter Distance:")
+tab1, tab2 = st.tabs(["Convert between DMS and Decimal Degrees", "Calculate Next Point"])
 
-        if distance_unit == "Nautical Miles (NM)":
-            distance_factor = 1852
-        elif distance_unit == "Kilometers (KM)":
-            distance_factor = 1000
-        else:
-            distance_factor = 1609.34
+with tab1:
+    st.header("Convert between DMS and Decimal Degrees")
+    input_str = st.text_input("Enter coordinates in either decimal degrees (e.g., 40.7128 or 40.7128N) or DMS format (e.g., 40° 42' 46.08\" N)")
+    if st.button("Convert"):
+        try:
+            decimal_degrees = parse_coordinates(input_str)
+            dms = decimal_degrees_to_dms(decimal_degrees)
+            st.write(f"Decimal Degrees: {decimal_degrees:.6f}")
+            st.write(f"DMS: {dms[0]}° {dms[1]}' {dms[2]:.2f}\"")
+        except ValueError as e:
+            st.error(f"Error: {e}")
 
-        if st.button("Find Next"):
-            try:
-                lat_deg = re.sub(r'[^\d\.\s-]', '', lat_deg)
-                lon_deg = re.sub(r'[^\d\.\s-]', '', lon_deg)
+with tab2:
+    st.header("Calculate Next Point")
+    lat_input = st.text_input("Enter starting latitude (e.g., 40.7128 or 40.7128N)")
+    lon_input = st.text_input("Enter starting longitude (e.g., -74.0060 or 74.0060W)")
+    bearing_input = st.number_input("Enter bearing in degrees (0-360)", value=90)
+    distance_input = st.number_input("Enter distance", value=50)
+    unit_input = st.selectbox("Select unit", ["nmi", "km", "mi"])
 
-                lat_deg_parts = lat_deg.split()
-                lon_deg_parts = lon_deg.split()
-
-                if len(lat_deg_parts) == 1:
-                    lat_dec = float(lat_deg_parts[0])
-                elif len(lat_deg_parts) == 3:
-                    lat_dec = deg_min_sec_to_dec(float(lat_deg_parts[0]), float(lat_deg_parts[1]), float(lat_deg_parts[2]))
-                else:
-                    raise ValueError("Invalid latitude format")
-
-                if len(lon_deg_parts) == 1:
-                    lon_dec = float(lon_deg_parts[0])
-                elif len(lon_deg_parts) == 3:
-                    lon_dec = deg_min_sec_to_dec(float(lon_deg_parts[0]), float(lon_deg_parts[1]), float(lon_deg_parts[2]))
-                else:
-                    raise ValueError("Invalid longitude format")
-
-                bearing = float(bearing)
-                distance = float(distance) * distance_factor
-
-                lat1, lon1 = math.radians(lat_dec), math.radians(lon_dec)
-                bearing = math.radians(bearing)
-
-                lat2 = math.asin(math.sin(lat1) * math.cos(distance / 6371) + math.cos(lat1) * math.sin(distance / 6371) * math.cos(bearing))
-                lon2 = lon1 + math.atan2(math.sin(bearing) * math.sin(distance / 6371) * math.cos(lat1), math.cos(distance / 6371) - math.sin(lat1) * math.sin(lat2))
-
-                lat2, lon2 = math.degrees(lat2), math.degrees(lon2)
-
-                lat_dms = dec_to_deg_min_sec(lat2, "N" if lat2 > 0 else "S")
-                lon_dms = dec_to_deg_min_sec(lon2, "E" if lon2 > 0 else "W")
-
-                st.write("### Next Coordinates:")
-                st.write("#### Decimal Degrees:")
-                st.write(f"Latitude: {lat2:.6f}")
-                st.write(f"Longitude: {lon2:.6f}")
-                st.write(f"Coordinates: {lat2:.6f}, {lon2:.6f}")
-                st.write("#### Degrees, Minutes, Seconds:")
-                st.write(f"Latitude: {lat_dms}")
-                st.write(f"Longitude: {lon_dms}")
-            except Exception as e:
-                st.write("An error occurred: ", e)
-
-if __name__ == "__main__":
-    main()
+    if st.button("Calculate"):
+        try:
+            lat = parse_coordinates(lat_input, is_latitude=True)
+            lon = parse_coordinates(lon_input, is_latitude=False)
+            bearing = bearing_input
+            distance = distance_input
+            unit = unit_input
+            dest_lat, dest_lon = calculate_destination(lat, lon, bearing, distance, unit)
+            st.write(f"Starting Point: {format_dd_output(lat, True)}, {format_dd_output(lon, False)}")
+            st.write(f"Bearing: {bearing}°")
+            st.write(f"Distance: {distance} {unit}")
+            st.write(f"Destination Point: {format_dd_output(dest_lat, True)}, {format_dd_output(dest_lon, False)}")
+            st.write(f"Decimal coordinates: {dest_lat:.6f}, {dest_lon:.6f}")
+        except ValueError as e:
+            st.error(f"Error: {e}")
