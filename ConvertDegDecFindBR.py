@@ -82,7 +82,8 @@ tab1, tab2 = st.tabs(["# Convert between DMS and Decimal Degrees", "# Calculate 
 
 with tab1:
     st.header("Convert between DMS and Decimal Degrees")
-    lat_lon_input = st.text_input("Enter latitude and longitude in either decimal degrees (e.g. 43.6532, -79.3832) or DMS (e.g. 43° 39' 12\", -79° 23' 0\") format, separated by a comma")
+    st.write("Enter latitude and longitude in either decimal degrees (e.g. 43.6532, -79.3832) or DMS (e.g. 43° 39' 12\", -79° 23' 0\") format, separated by a comma. Note: You can use a space instead of °, ', and \"")
+    lat_lon_input = st.text_input("")
     if st.button("Convert"):
         try:
             lat_input, lon_input = lat_lon_input.split(',')
@@ -94,12 +95,14 @@ with tab1:
             st.write(f"Latitude (DMS): {lat_dms[0]}° {lat_dms[1]}' {lat_dms[2]:.2f}\"")
             st.write(f"Longitude (Decimal Degrees): {lon_dd:.6f}")
             st.write(f"Longitude (DMS): {lon_dms[0]}° {lon_dms[1]}' {lon_dms[2]:.2f}\"")
+            st.write(f"Decimal coordinates: {lat_dd:.6f}, {lon_dd:.6f}")
         except ValueError as e:
             st.error(f"Error: {e}")
 
 with tab2:
     st.header("Calculate Next Point")
-    lat_lon_input = st.text_input("Enter starting latitude and longitude in either decimal degrees (e.g. 43.6532, -79.3832) or DMS (e.g. 43° 39' 12\", -79° 23' 0\") format, separated by a comma")
+    st.write("Enter starting latitude and longitude in either decimal degrees (e.g. 43.6532, -79.3832) or DMS (e.g. 43° 39' 12\", -79° 23' 0\") format, separated by a comma. Note: You can use a space instead of °, ', and \"")
+    lat_lon_input = st.text_input("")
     bearing_input = st.number_input("Enter bearing in degrees (0-360)", value=90)
     distance_input = st.number_input("Enter distance", value=50)
     unit_input = st.selectbox("Select unit", ["nmi", "km", "mi"])
@@ -117,5 +120,16 @@ with tab2:
             st.write(f"Bearing: {bearing}°")
             st.write(f"Distance: {distance} {unit}")
             st.write(f"Destination Point: {dest_lat:.6f}, {dest_lon:.6f}")
+            st.write(f"Decimal coordinates: {dest_lat:.6f}, {dest_lon:.6f}")
         except ValueError as e:
             st.error(f"Error: {e}")
+
+# Increase the font size of the tab titles
+st.markdown(f"""
+<style>
+[data-testid="stTab"] {{
+    font-size: 24px;
+    font-weight: bold;
+}}
+</style>
+""", unsafe_allow_html=True)
