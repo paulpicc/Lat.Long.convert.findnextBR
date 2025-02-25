@@ -75,11 +75,10 @@ def calculate_destination(lat1, lon1, bearing_deg, distance_nm, unit="nmi"):
     return (lat2, lon2)
 
 # Streamlit app
-st.title("Latitude and Longitude Converter")
-
+st.markdown("# Latitude and Longitude Converter")
 st.markdown("<br><br>", unsafe_allow_html=True)  # Add some space
 
-tab1, tab2 = st.tabs(["Convert between DMS and Decimal Degrees", "Calculate Next Point"])
+tab1, tab2 = st.tabs(["# Convert between DMS and Decimal Degrees", "# Calculate Next Point"])
 
 with tab1:
     st.header("Convert between DMS and Decimal Degrees")
