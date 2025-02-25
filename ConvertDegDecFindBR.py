@@ -78,13 +78,13 @@ def calculate_destination(lat1, lon1, bearing_deg, distance_nm, unit="nmi"):
 st.markdown("# Latitude and Longitude Converter")
 st.markdown("<br><br>", unsafe_allow_html=True)  # Add some space
 
-tab1, tab2 = st.tabs(["# Convert between DMS and Decimal Degrees", "# Calculate Next Point"])
+tab1, tab2 = st.tabs(["Convert between DMS and Decimal Degrees", "Calculate Next Point"])
 
 with tab1:
     st.header("Convert between DMS and Decimal Degrees")
     st.write("Enter latitude and longitude in either decimal degrees (e.g. 43.6532, -79.3832) or DMS (e.g. 43° 39' 12\", -79° 23' 0\") format, separated by a comma. Note: You can use a space instead of °, ', and \"")
-    lat_lon_input = st.text_input("")
-    if st.button("Convert"):
+    lat_lon_input = st.text_input("Enter coordinates", key="tab1_input")
+    if st.button("Convert", key="tab1_button"):
         try:
             lat_input, lon_input = lat_lon_input.split(',')
             lat_dd = parse_coordinates(lat_input.strip())
@@ -102,12 +102,12 @@ with tab1:
 with tab2:
     st.header("Calculate Next Point")
     st.write("Enter starting latitude and longitude in either decimal degrees (e.g. 43.6532, -79.3832) or DMS (e.g. 43° 39' 12\", -79° 23' 0\") format, separated by a comma. Note: You can use a space instead of °, ', and \"")
-    lat_lon_input = st.text_input("")
-    bearing_input = st.number_input("Enter bearing in degrees (0-360)", value=90)
-    distance_input = st.number_input("Enter distance", value=50)
-    unit_input = st.selectbox("Select unit", ["nmi", "km", "mi"])
+    lat_lon_input = st.text_input("Enter coordinates", key="tab2_input")
+    bearing_input = st.number_input("Enter bearing in degrees (0-360)", value=90, key="tab2_bearing")
+    distance_input = st.number_input("Enter distance", value=50, key="tab2_distance")
+    unit_input = st.selectbox("Select unit", ["nmi", "km", "mi"], key="tab2_unit")
 
-    if st.button("Calculate"):
+    if st.button("Calculate", key="tab2_button"):
         try:
             lat_input, lon_input = lat_lon_input.split(',')
             lat = parse_coordinates(lat_input.strip())
