@@ -77,13 +77,6 @@ def calculate_destination(lat1, lon1, bearing_deg, distance_nm, unit="nmi"):
 
     return (lat2, lon2)
 
-# Function to format decimal degrees as a human-readable string
-def format_dd_output(decimal_degrees, is_latitude=True):
-    if is_latitude:
-        return f"{abs(decimal_degrees):.6f}° {'N' if decimal_degrees >= 0 else 'S'}"
-    else:
-        return f"{abs(decimal_degrees):.6f}° {'E' if decimal_degrees >= 0 else 'W'}"
-
 # Streamlit app
 st.title("Latitude and Longitude Converter")
 
@@ -124,3 +117,9 @@ with tab2:
             st.write(f"Decimal coordinates: {dest_lat:.6f}, {dest_lon:.6f}")
         except ValueError as e:
             st.error(f"Error: {e}")
+
+def format_dd_output(decimal_degrees, is_latitude=True):
+    if is_latitude:
+        return f"{abs(decimal_degrees):.6f}° {'N' if decimal_degrees >= 0 else 'S'}"
+    else:
+        return f"{abs(decimal_degrees):.6f}° {'E' if decimal_degrees >= 0 else 'W'}"
