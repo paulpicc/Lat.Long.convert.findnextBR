@@ -78,6 +78,16 @@ def calculate_destination(lat1, lon1, bearing_deg, distance_nm, unit="nmi"):
 st.markdown("# Latitude and Longitude Converter")
 st.markdown("<br><br>", unsafe_allow_html=True)  # Add some space
 
+# Increase the font size of the tab titles
+st.markdown(f"""
+<style>
+div[data-testid="stHorizontalBlock"] div:has(> div[role="tablist"]) button {{
+    font-size: 24px;
+    font-weight: bold;
+}}
+</style>
+""", unsafe_allow_html=True)
+
 tab1, tab2 = st.tabs(["Convert between DMS and Decimal Degrees", "Calculate Next Point"])
 
 with tab1:
@@ -123,13 +133,3 @@ with tab2:
             st.write(f"Decimal coordinates: {dest_lat:.6f}, {dest_lon:.6f}")
         except ValueError as e:
             st.error(f"Error: {e}")
-
-# Increase the font size of the tab titles
-st.markdown(f"""
-<style>
-[data-testid="stTab"] {{
-    font-size: 24px;
-    font-weight: bold;
-}}
-</style>
-""", unsafe_allow_html=True)
